@@ -107,6 +107,7 @@ app.use(express.static('public'));
 // lit automatiquement les fichier statiques dans le dossier public
 
 // Il manque un token d'identification pour empecher les requetes par n'importe qui 
+// il faut un  middleware pour verifier tout ca. Je me renseigne. 
 
 //Requetes GET pour avoir la liste des affaires
 
