@@ -189,9 +189,7 @@ app.post('/api/chantiers', (req, res) => {
 
   // Vérifie les champs
   if (!nom || !affaire_id || !entreprise_id) return res.status(400).json({ error: 'Nom,entreprise et affaire obligatoires' });
-  
  
-
   // Numérotation automatique par année
   db.get('SELECT COUNT(*) AS count FROM chantiers WHERE numero LIKE ?', [`${prefix}%`], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
