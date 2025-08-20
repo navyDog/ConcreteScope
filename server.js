@@ -135,3 +135,70 @@ app.get('/api/chantiers', (req, res) => {
   });
 });
 
+// Requetes GET pour une éprouvettes à partir de son ID. 
+
+app.get('/api/eprouvettes', (req, res) => {
+  const chantierId = req.query.chantier_id;
+  const sql = `SELECT * FROM eprouvettes WHERE chantier_id = ?`;
+  db.all(sql, [chantierId], (err, rows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Erreur DB' });
+    }
+    res.json(rows);
+  });
+});
+
+
+// POST une nouvelle affaire
+
+app.post('/api/affaires', (req, res) => {
+  const { nom } = req.body;
+
+   // Vérifie que le nom est fourni
+  if (!nom || nom.trim() === '') {
+    return res.status(400).json({ error: 'Nom obligatoire' });
+  }
+
+  //insertion dans la table affaires 
+  db.run('INSERT INTO affaires (nom) VALUES (?)', [nom], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+
+   // this.lastID = ID auto-incrémenté de la nouvelle affaire
+    res.json({ id: this.lastID, nom });
+  });
+});
+
+//Post nouveau chantier 
+
+app.post('/api/chantiers', (req, res) => {
+  const { nom, affaire_id, entreprise_id , date_reception, date_prelevement, slump} = req.body;
+  const year = new Date().getFullYear();
+  const prefix = `${year}-B-`;
+
+  // Vérifie les champs
+  if (!nom || !affaire_id) return res.status(400).json({ error: 'Nom et affaire obligatoires' });
+  
+ 
+
+  // Numérotation automatique par année
+  db.get('SELECT COUNT(*) AS count FROM chantiers WHERE numero LIKE ?', [`${prefix}%`], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const numero = `${prefix}${row.count + 1}`; // ex: "2025-B-1"
+
+    const sql = `
+      INSERT INTO chantiers (numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const params = [nextNumero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump ];
+
+    db.run(sql, params, function (err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Erreur création chantier' });
+      }
+      res.json({ id: this.lastID, numero: nextNumero });
+    });
+  });
+});
