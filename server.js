@@ -1,19 +1,4 @@
 
-const express = require('express');
-//charge le module express qui permet de créer un serveur WEB en node.js
-const cors = require('cors');
-//charge le module CORS, cela permet d'autoriser le front à appeler les API sans blocage par le naviguateur
-const app = express();
-// crée une instance du serveur Express
-const PORT = 3000;
-//ecoute sur le port 3000, "http://localhost:3000
-app.use(cors());
-//active CORS, autorise les requetes cross-origin
-app.use(express.json());
-//le serveur lit automatiquement les requetes au format JSON
-app.use(express.static('public'));
-// lit automatiquement les fichier statiques dans le dossier public
-
 const sqlite3 = require('sqlite3').verbose(); 
  //charge la librairie SQLite3 pour accèder à une database SQLite
 
@@ -88,3 +73,50 @@ db.serialize(() => {
 
 
 });
+
+
+//SERVER EXPRESS
+
+const express = require('express');
+//charge le module express qui permet de créer un serveur WEB en node.js
+const cors = require('cors');
+//charge le module CORS, cela permet d'autoriser le front à appeler les API sans blocage par le naviguateur
+const app = express();
+// crée une instance du serveur Express
+const PORT = 3000;
+//ecoute sur le port 3000, "http://localhost:3000
+app.use(cors());
+//active CORS, autorise les requetes cross-origin
+app.use(express.json());
+//le serveur lit automatiquement les requetes au format JSON
+app.use(express.static('public'));
+// lit automatiquement les fichier statiques dans le dossier public
+
+// Il manque un token d'identification pour empecher les requetes par n'importe qui 
+
+//Requetes GET pour avoir la liste des affaires
+
+app.get('/api/affaires', (req, res) => {
+  db.all('SELECT * FROM affaires', (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+// Requetes GET tous les chantiers avec nom affaire
+
+app.get('/api/chantiers', (req, res) => {
+  const sql = `
+    SELECT chantiers.*, affaires.nom as affaire_nom
+    FROM chantiers
+    LEFT JOIN affaires ON chantiers.affaire_id = affaires.id
+    LEFT JOIN entreprises ON chantiers.entreprises_id = entreprises.id
+  `;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erreur lecture chantiers' });
+    }
+    res.json(rows);
+  });
+});
+
