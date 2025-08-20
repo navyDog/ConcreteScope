@@ -16,7 +16,7 @@ db.serialize(() => {
 
  
   db.run(`
-    CREATE TABLE users (
+    CREATE TABLE IF NOT EXISTS usersCS (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       passwordHash TEXT NOT NULL
@@ -66,7 +66,7 @@ db.serialize(() => {
       date_prelevement TEXT,
       slump TEXT,
       FOREIGN KEY (affaire_id) REFERENCES affaires(id),
-      FOREIGN KEY (entrerprise_id) REFERENCES entreprises(id)
+      FOREIGN KEY (entreprise_id) REFERENCES entreprises(id)
     )
   `);
 
@@ -79,8 +79,9 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS eprouvettes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       chantier_id INTEGER,
+      date_creation TEXT,
+      date_ecrasement TEXT,
       age_jour INTEGER,
-      nombre INTEGER,
       FOREIGN KEY (chantier_id) REFERENCES chantiers(id)
     )
   `);
@@ -110,7 +111,6 @@ app.use(express.static('public'));
 // il faut un  middleware pour verifier tout ca. Je me renseigne. 
 
 //Requetes GET pour avoir la liste des affaires
-
 app.get('/api/affaires', (req, res) => {
   db.all('SELECT * FROM affaires', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -118,14 +118,21 @@ app.get('/api/affaires', (req, res) => {
   });
 });
 
-// Requetes GET tous les chantiers avec nom affaire
+//Requetes GET pour avoir la liste des entreprises
+app.get('/api/entreprises', (req, res) => {
+  db.all('SELECT * FROM entreprises', (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
 
+// Requetes GET pour avoir tous les chantiers avec nom affaire
 app.get('/api/chantiers', (req, res) => {
   const sql = `
-    SELECT chantiers.*, affaires.nom as affaire_nom
+    SELECT chantiers.*, affaires.nom as affaire_nom, entreprises.nom as entreprise_nom
     FROM chantiers
     LEFT JOIN affaires ON chantiers.affaire_id = affaires.id
-    LEFT JOIN entreprises ON chantiers.entreprises_id = entreprises.id
+    LEFT JOIN entreprises ON chantiers.entreprise_id = entreprises.id
   `;
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -135,26 +142,12 @@ app.get('/api/chantiers', (req, res) => {
   });
 });
 
-// Requetes GET pour une éprouvettes à partir de son ID. 
-
-app.get('/api/eprouvettes', (req, res) => {
-  const chantierId = req.query.chantier_id;
-  const sql = `SELECT * FROM eprouvettes WHERE chantier_id = ?`;
-  db.all(sql, [chantierId], (err, rows) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Erreur DB' });
-    }
-    res.json(rows);
-  });
-});
 
 
-// POST une nouvelle affaire
+// Requete POST pour avoir une nouvelle affaire
 
 app.post('/api/affaires', (req, res) => {
   const { nom } = req.body;
-
    // Vérifie que le nom est fourni
   if (!nom || nom.trim() === '') {
     return res.status(400).json({ error: 'Nom obligatoire' });
@@ -163,8 +156,26 @@ app.post('/api/affaires', (req, res) => {
   //insertion dans la table affaires 
   db.run('INSERT INTO affaires (nom) VALUES (?)', [nom], function (err) {
     if (err) return res.status(500).json({ error: err.message });
-
    // this.lastID = ID auto-incrémenté de la nouvelle affaire
+    res.json({ id: this.lastID, nom });
+  });
+});
+
+// POST une nouvelle entreprise
+
+app.post('/api/entreprises', (req, res) => {
+  const { nom } = req.body;
+
+   // Vérifie que le nom est fourni
+  if (!nom || nom.trim() === '') {
+    return res.status(400).json({ error: 'Nom obligatoire' });
+  }
+
+  //insertion dans la table entreprises
+  db.run('INSERT INTO entreprises (nom) VALUES (?)', [nom], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+
+   // this.lastID = ID auto-incrémenté de la nouvelle entreprise
     res.json({ id: this.lastID, nom });
   });
 });
@@ -177,7 +188,7 @@ app.post('/api/chantiers', (req, res) => {
   const prefix = `${year}-B-`;
 
   // Vérifie les champs
-  if (!nom || !affaire_id) return res.status(400).json({ error: 'Nom et affaire obligatoires' });
+  if (!nom || !affaire_id || !entreprise_id) return res.status(400).json({ error: 'Nom,entreprise et affaire obligatoires' });
   
  
 
@@ -186,56 +197,26 @@ app.post('/api/chantiers', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
 
     const numero = `${prefix}${row.count + 1}`; // ex: "2025-B-1"
+    console.log(numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump );
 
     const sql = `
       INSERT INTO chantiers (numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump)
-      VALUES (?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const params = [nextNumero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump ];
+    const params = [numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump ];
 
     db.run(sql, params, function (err) {
       if (err) {
         console.error(err);
         return res.status(500).json({ error: 'Erreur création chantier' });
       }
-      res.json({ id: this.lastID, numero: nextNumero });
+      res.json({ id: this.lastID, numero: numero });
     });
   });
 });
 
 
-app.post('/api/eprouvettes', (req, res) => {
-  const { chantier_id, nb, jours } = req.body; 
 
-  if (!chantier_id) return res.status(400).json({ error: 'Chantier ID obligatoire' });
-
-  // Récupérer la date de réception du chantier
-  db.get('SELECT date_reception FROM chantiers WHERE id = ?', [chantier_id], (err, chantier) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!chantier || !chantier.date_reception) return res.status(400).json({ error: 'Date de réception non définie pour ce chantier' });
-
-    const date_creation = new Date(chantier.date_reception);
-
-    const stmt = db.prepare(`
-      INSERT INTO eprouvettes (chantier_id, date_creation, date_ecrasement, jours)
-      VALUES (?, ?, ?, ?)
-    `);
-
-    for (let i = 0; i < nb; i++) {
-      const date_ecrasement = new Date(date_creation);
-      date_ecrasement.setDate(date_creation.getDate() + parseInt(jours));
-      stmt.run(
-        chantier_id,
-        date_creation.toISOString(),
-        date_ecrasement.toISOString(),
-        jours
-      );
-    }
-
-    stmt.finalize(err => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ success: true });
-    });
-  });
+app.listen(3000, () => {
+  console.log('Serveur lancé sur http://localhost:3000');
 });
-
