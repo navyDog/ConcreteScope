@@ -241,10 +241,7 @@ app.post('/api/chantiers', (req, res) => {
   });
 });
 
-
 // Requete POST pour avoir une serie d'éprouvettes
-
-
 app.post('/api/eprouvettes', (req, res) => {
   const {chantier_id, nb, jours } = req.body; 
 
@@ -269,11 +266,11 @@ app.post('/api/eprouvettes', (req, res) => {
         chantier_id,
         date_creation.toISOString().split('T')[0],
         date_ecrasement.toISOString().split('T')[0],
-        jours,
-        hauteur,
-        diamtre,
-        force,
-        masse
+        parseInt(jours),
+        null, // hauteur - sera rempli plus tard
+        null, // diametre - sera rempli plus tard
+        null, // force - sera rempli plus tard
+        null  // masse - sera rempli plus tard
       );
     }
 

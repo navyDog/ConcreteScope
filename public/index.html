@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcreteLab - Gestion des Chantiers</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hard-hat"></i>
+                    <span>ConcreteLab</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Tableau de bord</span>
+                    </li>
+                    <li class="nav-item" data-section="chantiers">
+                        <i class="fas fa-building"></i>
+                        <span>Chantiers</span>
+                    </li>
+                    <li class="nav-item" data-section="affaires">
+                        <i class="fas fa-folder"></i>
+                        <span>Affaires</span>
+                    </li>
+                    <li class="nav-item" data-section="entreprises">
+                        <i class="fas fa-industry"></i>
+                        <span>Entreprises</span>
+                    </li>
+                    <li class="nav-item" data-section="eprouvettes">
+                        <i class="fas fa-cubes"></i>
+                        <span>Éprouvettes</span>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 id="page-title">Tableau de bord</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Administrateur</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="section active">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-chantiers">0</h3>
+                                <p>Chantiers actifs</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-affaires">0</h3>
+                                <p>Affaires en cours</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-industry"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-entreprises">0</h3>
+                                <p>Entreprises</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-cubes"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="total-eprouvettes">0</h3>
+                                <p>Éprouvettes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="chart-container">
+                            <h3>Chantiers par mois</h3>
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>Graphique des chantiers</p>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-activities">
+                            <h3>Activités récentes</h3>
+                            <div class="activity-list" id="recent-activities">
+                                <!-- Activities will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chantiers Section -->
+                <section id="chantiers" class="section">
+                    <div class="section-header">
+                        <h2>Gestion des Chantiers</h2>
+                        <button class="btn btn-primary" id="add-chantier-btn">
+                            <i class="fas fa-plus"></i>
+                            Nouveau Chantier
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Nom</th>
+                                    <th>Affaire</th>
+                                    <th>Entreprise</th>
+                                    <th>Date Réception</th>
+                                    <th>Date Prélèvement</th>
+                                    <th>Slump</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="chantiers-table-body">
+                                <!-- Chantiers will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Affaires Section -->
+                <section id="affaires" class="section">
+                    <div class="section-header">
+                        <h2>Gestion des Affaires</h2>
+                        <button class="btn btn-primary" id="add-affaire-btn">
+                            <i class="fas fa-plus"></i>
+                            Nouvelle Affaire
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="affaires-table-body">
+                                <!-- Affaires will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Entreprises Section -->
+                <section id="entreprises" class="section">
+                    <div class="section-header">
+                        <h2>Gestion des Entreprises</h2>
+                        <button class="btn btn-primary" id="add-entreprise-btn">
+                            <i class="fas fa-plus"></i>
+                            Nouvelle Entreprise
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="entreprises-table-body">
+                                <!-- Entreprises will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Eprouvettes Section -->
+                <section id="eprouvettes" class="section">
+                    <div class="section-header">
+                        <h2>Gestion des Éprouvettes</h2>
+                        <button class="btn btn-primary" id="add-eprouvette-btn">
+                            <i class="fas fa-plus"></i>
+                            Nouvelle Série
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Chantier</th>
+                                    <th>Date Création</th>
+                                    <th>Date Écrasement</th>
+                                    <th>Âge (jours)</th>
+                                    <th>Hauteur</th>
+                                    <th>Diamètre</th>
+                                    <th>Force</th>
+                                    <th>Masse</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eprouvettes-table-body">
+                                <!-- Eprouvettes will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Titre du Modal</h3>
+                <button class="modal-close" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Modal content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
