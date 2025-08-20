@@ -1,3 +1,19 @@
+
+const express = require('express');
+//charge le module express qui permet de créer un serveur WEB en node.js
+const cors = require('cors');
+//charge le module CORS, cela permet d'autoriser le front à appeler les API sans blocage par le naviguateur
+const app = express();
+// crée une instance du serveur Express
+const PORT = 3000;
+//ecoute sur le port 3000, "http://localhost:3000
+app.use(cors());
+//active CORS, autorise les requetes cross-origin
+app.use(express.json());
+//le serveur lit automatiquement les requetes au format JSON
+app.use(express.static('public'));
+// lit automatiquement les fichier statiques dans le dossier public
+
 const sqlite3 = require('sqlite3').verbose(); 
  //charge la librairie SQLite3 pour accèder à une database SQLite
 
