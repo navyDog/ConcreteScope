@@ -82,6 +82,10 @@ db.serialize(() => {
       date_creation TEXT,
       date_ecrasement TEXT,
       age_jour INTEGER,
+      hauteur INTEGER,
+      diametre INTEGER,
+      force INTEGER,
+      masse INTEGER,
       FOREIGN KEY (chantier_id) REFERENCES chantiers(id)
     )
   `);
@@ -212,6 +216,40 @@ app.post('/api/chantiers', (req, res) => {
     });
   });
 });
+
+// Requete POST pour avoir une serie d'éprouvettes
+
+app.post('/api/eprouvettes', (req, res) => {
+  const { nom, affaire_id, entreprise_id , date_reception, date_prelevement, slump} = req.body;
+  const year = new Date().getFullYear();
+  const prefix = `${year}-B-`;
+
+  // Vérifie les champs
+  if (!nom || !affaire_id || !entreprise_id) return res.status(400).json({ error: 'Nom,entreprise et affaire obligatoires' });
+ 
+  // Numérotation automatique par année
+  db.get('SELECT COUNT(*) AS count FROM chantiers WHERE numero LIKE ?', [`${prefix}%`], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const numero = `${prefix}${row.count + 1}`; // ex: "2025-B-1"
+    console.log(numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump );
+
+    const sql = `
+      INSERT INTO chantiers (numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const params = [numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump ];
+
+    db.run(sql, params, function (err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Erreur création chantier' });
+      }
+      res.json({ id: this.lastID, numero: numero });
+    });
+  });
+});
+
 
 
 
