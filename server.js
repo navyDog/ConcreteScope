@@ -242,8 +242,8 @@ app.post('/api/eprouvettes', (req, res) => {
       date_ecrasement.setDate(date_creation.getDate() + parseInt(jours));
       stmt.run(
         chantier_id,
-        date_creation.toISOString(),
-        date_ecrasement.toISOString(),
+        date_creation.toISOString().split('T')[0],
+        date_ecrasement.toISOString().split('T')[0],
         jours,
         hauteur,
         diamtre,
