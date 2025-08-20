@@ -220,6 +220,44 @@ app.post('/api/chantiers', (req, res) => {
 // Requete POST pour avoir une serie d'éprouvettes
 
 
+app.post('/api/eprouvettes', (req, res) => {
+  const {chantier_id, nb, jours } = req.body; 
+
+  if (!chantier_id) return res.status(400).json({ error: 'Chantier ID obligatoire' });
+
+  // Récupérer la date de réception du chantier
+  db.get('SELECT date_reception FROM chantiers WHERE id = ?', [chantier_id], (err, chantier) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!chantier || !chantier.date_reception) return res.status(400).json({ error: 'Date de réception non définie pour ce chantier' });
+
+    const date_creation = new Date(chantier.date_reception);
+
+    const stmt = db.prepare(`
+      INSERT INTO eprouvettes (chantier_id, date_creation, date_ecrasement, age_jour, hauteur, diametre, force, masse)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    for (let i = 0; i < nb; i++) {
+      const date_ecrasement = new Date(date_creation);
+      date_ecrasement.setDate(date_creation.getDate() + parseInt(jours));
+      stmt.run(
+        chantier_id,
+        date_creation.toISOString(),
+        date_ecrasement.toISOString(),
+        jours,
+        hauteur,
+        diamtre,
+        force,
+        masse
+      );
+    }
+
+    stmt.finalize(err => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ success: true });
+    });
+  });
+});
 
 
 app.listen(3000, () => {
