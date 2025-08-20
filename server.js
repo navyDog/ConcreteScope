@@ -217,9 +217,23 @@ app.post('/api/chantiers', (req, res) => {
   });
 });
 
+// Requete GET pour récupérer toutes les éprouvettes
+app.get('/api/eprouvettes', (req, res) => {
+  const sql = `
+    SELECT eprouvettes.*, chantiers.nom as chantier_nom, chantiers.numero as chantier_numero
+    FROM eprouvettes
+    LEFT JOIN chantiers ON eprouvettes.chantier_id = chantiers.id
+    ORDER BY eprouvettes.date_creation DESC
+  `;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erreur lecture éprouvettes' });
+    }
+    res.json(rows);
+  });
+});
+
 // Requete POST pour avoir une serie d'éprouvettes
-
-
 app.post('/api/eprouvettes', (req, res) => {
   const {chantier_id, nb, jours } = req.body; 
 
@@ -244,11 +258,11 @@ app.post('/api/eprouvettes', (req, res) => {
         chantier_id,
         date_creation.toISOString().split('T')[0],
         date_ecrasement.toISOString().split('T')[0],
-        jours,
-        hauteur,
-        diamtre,
-        force,
-        masse
+        parseInt(jours),
+        null, // hauteur - sera rempli plus tard
+        null, // diametre - sera rempli plus tard
+        null, // force - sera rempli plus tard
+        null  // masse - sera rempli plus tard
       );
     }
 
