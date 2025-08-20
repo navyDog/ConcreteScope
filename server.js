@@ -82,10 +82,6 @@ db.serialize(() => {
       date_creation TEXT,
       date_ecrasement TEXT,
       age_jour INTEGER,
-      hauteur INTEGER,
-      diametre INTEGER,
-      force INTEGER,
-      masse INTEGER,
       FOREIGN KEY (chantier_id) REFERENCES chantiers(id)
     )
   `);
@@ -115,6 +111,7 @@ app.use(express.static('public'));
 // il faut un  middleware pour verifier tout ca. Je me renseigne. 
 
 //Requetes GET pour avoir la liste des affaires
+
 app.get('/api/affaires', (req, res) => {
   db.all('SELECT * FROM affaires', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -123,6 +120,7 @@ app.get('/api/affaires', (req, res) => {
 });
 
 //Requetes GET pour avoir la liste des entreprises
+
 app.get('/api/entreprises', (req, res) => {
   db.all('SELECT * FROM entreprises', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -130,7 +128,18 @@ app.get('/api/entreprises', (req, res) => {
   });
 });
 
-// Requetes GET pour avoir tous les chantiers avec nom affaire
+
+// Requetes GET tous les chantiers
+app.get('/api/chantiers', (req, res) => {
+  db.all('SELECT id, nom, date_reception FROM chantiers', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+
+// Requetes GET tous les chantiers avec nom affaire
+
 app.get('/api/chantiers', (req, res) => {
   const sql = `
     SELECT chantiers.*, affaires.nom as affaire_nom, entreprises.nom as entreprise_nom
@@ -146,9 +155,22 @@ app.get('/api/chantiers', (req, res) => {
   });
 });
 
+// Requetes GET pour une éprouvettes à partir de son ID. 
+
+app.get('/api/eprouvettes', (req, res) => {
+  const chantierId = req.query.chantier_id;
+  const sql = `SELECT * FROM eprouvettes WHERE chantier_id = ?`;
+  db.all(sql, [chantierId], (err, rows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Erreur DB' });
+    }
+    res.json(rows);
+  });
+});
 
 
-// Requete POST pour avoir une nouvelle affaire
+// POST une nouvelle affaire
 
 app.post('/api/affaires', (req, res) => {
   const { nom } = req.body;
@@ -192,8 +214,10 @@ app.post('/api/chantiers', (req, res) => {
   const prefix = `${year}-B-`;
 
   // Vérifie les champs
-  if (!nom || !affaire_id || !entreprise_id) return res.status(400).json({ error: 'Nom,entreprise et affaire obligatoires' });
+  if (!nom || !affaire_id || !entreprise_id) return res.status(400).json({ error: 'Nom et affaire obligatoires' });
+  
  
+
   // Numérotation automatique par année
   db.get('SELECT COUNT(*) AS count FROM chantiers WHERE numero LIKE ?', [`${prefix}%`], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -216,6 +240,7 @@ app.post('/api/chantiers', (req, res) => {
     });
   });
 });
+
 
 // Requete POST pour avoir une serie d'éprouvettes
 
@@ -258,6 +283,20 @@ app.post('/api/eprouvettes', (req, res) => {
     });
   });
 });
+
+// Liste des éprouvettes
+app.get('/api/eprouvettes', (req, res) => {
+  db.all(`
+    SELECT e.*, c.nom as chantier_nom
+    FROM eprouvettes e
+    LEFT JOIN chantiers c ON e.chantier_id = c.id
+    ORDER BY e.date_ecrasement ASC
+  `, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
 
 
 app.listen(3000, () => {
