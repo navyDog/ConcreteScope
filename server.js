@@ -9,6 +9,20 @@ const db = new sqlite3.Database('./data.db');
 
 db.serialize(() => {
 
+//TABLE "users"
+// "id" c'est lidentifiant unique crée par SQLite
+// "username" nom de l'utilisateur
+// "passwordHash" mdp du compte
+
+ 
+  db.run(`
+    CREATE TABLE users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      passwordHash TEXT NOT NULL
+    )
+  `);
+ 
 //TABLE "affaires"
 // "id" c'est lidentifiant unique crée par SQLite
 // "nom" nom de l'affaire à donner par l'utilisateur 
