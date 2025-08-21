@@ -25,10 +25,12 @@ db.serialize(() => {
  
 //TABLE "affaires"
 // "id" c'est lidentifiant unique crée par SQLite
-// "nom" nom de l'affaire à donner par l'utilisateur 
+// "nom" nom de l'affaire à donner par l'utilisateur - c'est le nom du projet
 // "contact" : contact principale de l'entreprise
 // "courriel" : son courriel
 // "telephone" : son tel
+// "MOA" : Maitre d'ouvrage de l'affaire
+// "MOE" : Maitre d"oeuvre de l'affaire
   
   db.run(`
     CREATE TABLE IF NOT EXISTS affaires (
@@ -36,7 +38,9 @@ db.serialize(() => {
       nom TEXT NOT NULL,
       contact TEXT, 
       courriel TEXT, 
-      telephone TEXT
+      telephone TEXT,
+      MOA TEXT,
+      MOE TEXT
     )
   `);
 
@@ -60,41 +64,60 @@ db.serialize(() => {
   
 //TABLE "chantiers"
 // "id" c'est lidentifiant unique crée par SQLite
-// "numero" c'est le numero du chantier qui est généré automatiquement. Il vaut "Année en cours"-"B"-"numérotation progressive" soit le premier de l'an "2025-B-0001"
-// "nom" nom du chantier donnée par l'utilisateur
 // "affaire_id" id de l'affaire associé à ce chantier
 // "entrerpises_id" id de l'entreprise qui est en charge du chantier
+// "numero" c'est le numero du chantier qui est généré automatiquement. Il vaut "Année en cours"-"B"-"numérotation progressive" soit le premier de l'an "2025-B-0001"
+// "nomOuvrage" nom de l'ouvrage pour ce chantier 
+// "nomPartieOuvrage" nom de la partie de l'ouvrage pour ce chantier
+// "fabricantBeton" fabricant du beton 
+// "lieuFabrication" Lieu de fabrication du beton sur site ou centrale etc
+// "modeLivraison" mode de livraison du beton toupie, betoniere etc 
 // "date_reception" date de reception du béton
 // "date_prelevement" date de prelevement du béton
-// "slump" slump du béton mesuré par le cône d'Abraham
-// "norme" choisir la norme de travail NF P94-???
-// "vibration" mode vibration du béton : piquage/serrage avec aiguille à vibrer ? 
-// "surfacage" mode de surfacage du béton : Rectification, souffrage, sableuse ? 
-// "conservation" : mode de conservation : piscine thermostat 20degré
-// "tEprouvette" type d'éprouvette : Cylindrique 16x32 ou C 15x30 etc 
-// "lieuConfection" : sur site/toupie à béton etc
-// 'cBeton" : classe de béton visée C30/37 C25/30 etc
-// "typeEssai" : type d'essai Essai de compression sur béton hydraulique  
+// "cBeton" : classe de béton visée C30/37 C25/30 etc
+// "vBeton"  volume de béton coulé pour ce chantier 
+// "norme" choisir la norme de travail NF P94-??? 
+// 'infoFormule", inforamtion sur le beton 
 // "melangeBeton" type de melange du beton sand/gravel/cement/water 
+// "tEprouvette" type d'éprouvette : Cylindrique CUBIQUE Prismatiques Carottes 16x32 ou C 15x30 etc 
+// "lieuPrelevement" Lieu de prelevement Chantier Centrale
+// "slump" affaissement mesurée 
+// "serrage"  mode serrage du béton : piquage/vibration avec aiguille à vibrer ? 
+// "conservation" : mode de conservation : piscine thermostat 20degré 
+// "couches" nombres de couches 
+// "tVibration" durée de vibration 
+// "typeEssai" : type d'essai Essai de compression/fendage/flexion sur béton hydraulique  
+// "preparation" mode de preparation des appuis : Rectification, souffrage, sableuse ? 
+// "presse" type de presse utilisée  
+
   db.run(`
     CREATE TABLE IF NOT EXISTS chantiers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      numero INTEGER UNIQUE,
-      nom TEXT NOT NULL,
       affaire_id INTEGER,
       entreprise_id INTEGER,
+      numero INTEGER UNIQUE,
+      nomOuvrage TEXT NOT NULL,
+      nomPartieOuvrage TEXT,
+      fabricantBeton TEXT,
+      lieuFabrication TEXT,
+      modeLivraison TEXT,
       date_reception TEXT,
       date_prelevement TEXT,
-      slump TEXT,
-      norme TEXT,
-      vibration TEXT,
-      surfacage TEXT,
-      conservation TEXT,
-      tEprouvette TEXT,
-      lieuConfection TEXT,
       cBeton TEXT,
-      typeEssai TEXT,
+      vBeton TEXT,
+      norme TEXT,
+      infoFormule TEXT,
       melangeBeton TEXT, 
+      tEprouvette TEXT,
+      lieuPrelevement TEXT,
+      slump TEXT,
+      serrage TEXT,
+      conservation TEXT,
+      couches TEXT,
+      tVibration TEXT,
+      typeEssai TEXT,
+      preparation TEXT,
+      presse TEXT,
       FOREIGN KEY (affaire_id) REFERENCES affaires(id),
       FOREIGN KEY (entreprise_id) REFERENCES entreprises(id)
     )
@@ -103,17 +126,24 @@ db.serialize(() => {
 //TABLE "eprouvettes"
 // "id" c'est lidentifiant unique crée par SQLite
 // "chantier_id" id du chantier associé à ces éprouvettes
-// "age_jour" nombre de jour avant écrasement des éprouvettes 
-// "nombre" nombre d'éprouvettes
+ // "age_jour" nombre de jour avant écrasement des éprouvettes 
+// "date_creation" = date de prevelevement
+// "date_ecrasement" = date creation + age jour
+//"hauteur" 
+//"diametre
+// surface = pi*(diametre/2)^2 
+//"force
+//"masse 
   db.run(`
     CREATE TABLE IF NOT EXISTS eprouvettes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       chantier_id INTEGER,
+      age_jour INTEGER,
       date_creation TEXT,
       date_ecrasement TEXT,
-      age_jour INTEGER,
       hauteur INTEGER,
       diametre INTEGER,
+      surface INTEGER
       force INTEGER,
       masse INTEGER,
       FOREIGN KEY (chantier_id) REFERENCES chantiers(id)
