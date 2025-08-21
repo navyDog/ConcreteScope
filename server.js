@@ -193,13 +193,7 @@ app.get('/api/entreprises', (req, res) => {
 });
 
 
-// Requetes GET tous les chantiers
-app.get('/api/chantiers', (req, res) => {
-  db.all('SELECT * FROM chantiers', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
-});
+
 
 
 // Requetes GET tous les chantiers avec nom affaire
