@@ -26,22 +26,34 @@ db.serialize(() => {
 //TABLE "affaires"
 // "id" c'est lidentifiant unique crée par SQLite
 // "nom" nom de l'affaire à donner par l'utilisateur 
+// "contact" : contact principale de l'entreprise
+// "courriel" : son courriel
+// "telephone" : son tel
   
   db.run(`
     CREATE TABLE IF NOT EXISTS affaires (
       id INTEGER PRIMARY KEY AUTOINCREMENT, 
-      nom TEXT NOT NULL
+      nom TEXT NOT NULL,
+      contact TEXT, 
+      courriel TEXT, 
+      telephone TEXT
     )
   `);
 
 //TABLE "entreprises"
 // "id" c'est lidentifiant unique crée par SQLite
 // "nom" nom de l'entreprise à donner par l'utilisateur 
+// "contact" : contact principale pour cette affaire
+// "courriel" : son courriel
+// "telephone" : son tel
   
   db.run(`
     CREATE TABLE IF NOT EXISTS entreprises (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nom TEXT NOT NULL
+      contact TEXT, 
+      courriel TEXT, 
+      telephone TEXT
     )
   `);
 
