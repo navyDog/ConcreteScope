@@ -282,7 +282,7 @@ app.post('/api/eprouvettes', (req, res) => {
 });
 
 // Liste des éprouvettes
-app.get('/api/eprouvettes', (req, res) => {
+app.get('/api/alleprouvettes', (req, res) => {
   db.all(`
     SELECT e.*, c.nom as chantier_nom
     FROM eprouvettes e
