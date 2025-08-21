@@ -199,7 +199,7 @@ class ConcreteLabApp {
         tbody.innerHTML = chantiers.map(chantier => `
             <tr>
                 <td><strong>${chantier.numero}</strong></td>
-                <td>${chantier.nom}</td>
+                <td>${chantier.nomOuvrage}</td>
                 <td>${chantier.affaire_nom || '-'}</td>
                 <td>${chantier.entreprise_nom || '-'}</td>
                 <td>${this.formatDate(chantier.date_reception)}</td>
@@ -530,7 +530,7 @@ class ConcreteLabApp {
     // API Calls
     async createChantier() {
         const formData = {
-            nom: document.getElementById('chantier-nom').value,
+            nomOuvrage: document.getElementById('chantier-nom').value,
             affaire_id: document.getElementById('chantier-affaire').value,
             entreprise_id: document.getElementById('chantier-entreprise').value,
             date_reception: document.getElementById('chantier-date-reception').value,
