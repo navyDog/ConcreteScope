@@ -54,7 +54,7 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS entreprises (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nom TEXT NOT NULL
+      nom TEXT NOT NULL,
       contact TEXT, 
       courriel TEXT, 
       telephone TEXT
@@ -96,7 +96,7 @@ db.serialize(() => {
       affaire_id INTEGER,
       entreprise_id INTEGER,
       numero INTEGER UNIQUE,
-      nomOuvrage TEXT NOT NULL,
+      nomOuvrage TEXT,
       nomPartieOuvrage TEXT,
       fabricantBeton TEXT,
       lieuFabrication TEXT,
@@ -267,12 +267,12 @@ app.post('/api/entreprises', (req, res) => {
 //Post nouveau chantier 
 
 app.post('/api/chantiers', (req, res) => {
-  const { nom, affaire_id, entreprise_id , date_reception, date_prelevement, slump} = req.body;
+  const {nomOuvrage, affaire_id, entreprise_id , date_reception, date_prelevement, slump} = req.body;
   const year = new Date().getFullYear();
   const prefix = `${year}-B-`;
 
   // Vérifie les champs
-  if (!nom || !affaire_id || !entreprise_id) return res.status(400).json({ error: 'Nom et affaire obligatoires' });
+  if (!nomOuvrage || !affaire_id || !entreprise_id) return res.status(400).json({ error: 'Nom et affaire obligatoires' });
   
  
 
@@ -281,13 +281,13 @@ app.post('/api/chantiers', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
 
     const numero = `${prefix}${row.count + 1}`; // ex: "2025-B-1"
-    console.log(numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump );
+    console.log(numero, nomOuvrage, affaire_id, entreprise_id, date_reception, date_prelevement, slump );
 
     const sql = `
       INSERT INTO chantiers (affaire_id, entreprise_id, numero, nomOuvrage, date_reception, date_prelevement, slump)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const params = [affaire_id, entreprise_id, numero, nom, date_reception, date_prelevement, slump ];
+    const params = [affaire_id, entreprise_id, numero, nomOuvrage, date_reception, date_prelevement, slump ];
 
     db.run(sql, params, function (err) {
       if (err) {
