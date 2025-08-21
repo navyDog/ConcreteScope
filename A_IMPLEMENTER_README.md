@@ -50,9 +50,4 @@ Page avec liste des chantiers (par ordre du plus récent au plus ancien) avec bo
 
 
 
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      chantier_id INTEGER,
-      date_creation TEXT,
-      date_ecrasement TEXT,
-      age_jour INTEGER,
-      FOREIGN KEY (chantier_id) REFERENCES chantiers(id)
+
