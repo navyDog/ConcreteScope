@@ -55,6 +55,15 @@ db.serialize(() => {
 // "date_reception" date de reception du béton
 // "date_prelevement" date de prelevement du béton
 // "slump" slump du béton mesuré par le cône d'Abraham
+// "norme" choisir la norme de travail NF P94-???
+// "vibration" mode vibration du béton : piquage/serrage avec aiguille à vibrer ? 
+// "surfacage" mode de surfacage du béton : Rectification, souffrage, sableuse ? 
+// "conservation" : mode de conservation : piscine thermostat 20degré
+// "tEprouvette" type d'éprouvette : Cylindrique 16x32 ou C 15x30 etc 
+// "lieuConfection" : sur site/toupie à béton etc
+// 'cBeton" : classe de béton visée C30/37 C25/30 etc
+// "typeEssai" : type d'essai Essai de compression sur béton hydraulique  
+// "melangeBeton" type de melange du beton sand/gravel/cement/water 
   db.run(`
     CREATE TABLE IF NOT EXISTS chantiers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,6 +74,15 @@ db.serialize(() => {
       date_reception TEXT,
       date_prelevement TEXT,
       slump TEXT,
+      norme TEXT,
+      vibration TEXT,
+      surfacage TEXT,
+      conservation TEXT,
+      tEprouvette TEXT,
+      lieuConfection TEXT,
+      cBeton TEXT,
+      typeEssai TEXT,
+      melangeBeton TEXT, 
       FOREIGN KEY (affaire_id) REFERENCES affaires(id),
       FOREIGN KEY (entreprise_id) REFERENCES entreprises(id)
     )
@@ -82,6 +100,10 @@ db.serialize(() => {
       date_creation TEXT,
       date_ecrasement TEXT,
       age_jour INTEGER,
+      hauteur INTEGER,
+      diametre INTEGER,
+      force INTEGER,
+      masse INTEGER,
       FOREIGN KEY (chantier_id) REFERENCES chantiers(id)
     )
   `);
