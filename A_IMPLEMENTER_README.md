@@ -42,6 +42,10 @@ Page avec liste des chantiers (par ordre du plus récent au plus ancien) avec bo
 -date_creation 
 -date_ecrasement 
 -age_jour
+-hauteur (à implementer)
+-diametre (à implementer)
+-force (à implementer)
+-masse (à implementer)
 
 
 
