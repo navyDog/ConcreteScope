@@ -284,10 +284,10 @@ app.post('/api/chantiers', (req, res) => {
     console.log(numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump );
 
     const sql = `
-      INSERT INTO chantiers (numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump)
+      INSERT INTO chantiers (affaire_id, entreprise_id, numero, nomOuvrage, date_reception, date_prelevement, slump)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const params = [numero, nom, affaire_id, entreprise_id, date_reception, date_prelevement, slump ];
+    const params = [affaire_id, entreprise_id, numero, nom, date_reception, date_prelevement, slump ];
 
     db.run(sql, params, function (err) {
       if (err) {
@@ -313,7 +313,7 @@ app.post('/api/eprouvettes', (req, res) => {
     const date_creation = new Date(chantier.date_reception);
 
     const stmt = db.prepare(`
-      INSERT INTO eprouvettes (chantier_id, date_creation, date_ecrasement, age_jour, hauteur, diametre, force, masse)
+      INSERT INTO eprouvettes (chantier_id, age_jour, date_creation, date_ecrasement, hauteur, diametre, force, masse)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
@@ -322,9 +322,9 @@ app.post('/api/eprouvettes', (req, res) => {
       date_ecrasement.setDate(date_creation.getDate() + parseInt(jours));
       stmt.run(
         chantier_id,
+        parseInt(jours),
         date_creation.toISOString().split('T')[0],
         date_ecrasement.toISOString().split('T')[0],
-        parseInt(jours),
         null, // hauteur - sera rempli plus tard
         null, // diametre - sera rempli plus tard
         null, // force - sera rempli plus tard
