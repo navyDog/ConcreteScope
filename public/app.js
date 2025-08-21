@@ -169,7 +169,7 @@ class ConcreteLabApp {
 
     async loadEprouvettes() {
         try {
-            const eprouvettes = await this.fetchData('/api/eprouvettes');
+            const eprouvettes = await this.fetchData('/api/alleprouvettes');
             this.data.eprouvettes = eprouvettes;
             this.renderEprouvettesTable(eprouvettes);
         } catch (error) {

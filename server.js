@@ -143,8 +143,7 @@ db.serialize(() => {
       date_ecrasement TEXT,
       hauteur INTEGER,
       diametre INTEGER,
-      surface INTEGER
-      force INTEGER,
+      surface INTEGER, force INTEGER,
       masse INTEGER,
       FOREIGN KEY (chantier_id) REFERENCES chantiers(id)
     )
@@ -325,10 +324,10 @@ app.post('/api/eprouvettes', (req, res) => {
         parseInt(jours),
         date_creation.toISOString().split('T')[0],
         date_ecrasement.toISOString().split('T')[0],
-        null, // hauteur - sera rempli plus tard
-        null, // diametre - sera rempli plus tard
-        null, // force - sera rempli plus tard
-        null  // masse - sera rempli plus tard
+        1, // hauteur - sera rempli plus tard
+        1, // diametre - sera rempli plus tard
+        1, // force - sera rempli plus tard
+        1  // masse - sera rempli plus tard
       );
     }
 
@@ -342,10 +341,7 @@ app.post('/api/eprouvettes', (req, res) => {
 // Liste des éprouvettes dans leur totalité
 app.get('/api/alleprouvettes', (req, res) => {
   db.all(`
-    SELECT e.*, c.nom as chantier_nom
-    FROM eprouvettes e
-    LEFT JOIN chantiers c ON e.chantier_id = c.id
-    ORDER BY e.date_ecrasement ASC
+    SELECT * FROM eprouvettes 
   `, [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
