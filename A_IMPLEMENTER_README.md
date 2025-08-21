@@ -29,12 +29,12 @@ Page avec liste des chantiers (par ordre du plus récent au plus ancien) avec bo
 -NORMES (à implementer)
 -piquage ou vibrage (à implementer)
 -Essai sur beton hydraulique compression ou non (à implementer)
-- type d'éprouvette (à implementer)
+-type d'éprouvette (à implementer)
 -lieu de confection sur site ou non/centrale ou toupie (à implementer)
 -Rectification au sooufre ou non) (à implementer)
 -condition de conservation (à implementer)
 
-- on clique sur un chantier on peut avoir la liste des eprouvettes et toute les infos ( avec bouton pour en ajouter/modifier/supprimer
+On clique sur un chantier on peut avoir la liste des eprouvettes et toute les infos ( avec bouton pour en ajouter/modifier/supprimer
 
 -éprouvettes 
 -id
