@@ -4,13 +4,10 @@
 
 //SERVER EXPRESS
 
-/* const https = require('https');
+const https = require('https');
 const fs = require('fs');
 
-const options = {
-  key: fs.readFileSync('key.pem'),   // clé privée
-  cert: fs.readFileSync('cert.pem')  // certificat auto-signé
-}; */
+
 
 
 
@@ -65,10 +62,17 @@ setInterval(() => {
 }, 3600 * 1000); // toutes les heures
 // il faut un  middleware pour verifier tout ca. Je me renseigne. 
 
+/* const privateKey = fs.readFileSync("./certs/server.key", "utf8");
+const certificate = fs.readFileSync("./certs/server.cert", "utf8");
+
+const credentials = { key: privateKey, cert: certificate }; */
+
  app.listen(PORT, () => {
   console.log(`✅ Serveur lancé sur http://localhost:${PORT}`);
-}); 
+});  
 
-/* https.createServer(options, app).listen(PORT, () => {
-  console.log(`✅ Serveur lancé sur http://localhost:${PORT}`);
+// Démarrer HTTPS
+
+/* https.createServer(credentials, app).listen(PORT, () => {
+  console.log(`🚀 Serveur HTTPS lancé sur https://localhost:${PORT}`);
 }); */
