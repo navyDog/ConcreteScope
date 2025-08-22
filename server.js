@@ -167,7 +167,7 @@ app.use(cors());
 //active CORS, autorise les requetes cross-origin
 app.use(express.json());
 //le serveur lit automatiquement les requetes au format JSON
-app.use(express.static('public'));
+app.use(express.static('../public'));
 // lit automatiquement les fichier statiques dans le dossier public
 
 // Il manque un token d'identification pour empecher les requetes par n'importe qui 

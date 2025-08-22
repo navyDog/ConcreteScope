@@ -111,7 +111,7 @@ class ConcreteLabApp {
                 this.fetchData('/api/chantiers'),
                 this.fetchData('/api/affaires'),
                 this.fetchData('/api/entreprises'),
-                this.fetchData('/api/eprouvettes')
+                this.fetchData('/api/eprouvettes/all')
             ]);
 
             // Update dashboard stats
@@ -169,7 +169,7 @@ class ConcreteLabApp {
 
     async loadEprouvettes() {
         try {
-            const eprouvettes = await this.fetchData('/api/alleprouvettes');
+            const eprouvettes = await this.fetchData('/api/eprouvettes/all');
             this.data.eprouvettes = eprouvettes;
             this.renderEprouvettesTable(eprouvettes);
         } catch (error) {
