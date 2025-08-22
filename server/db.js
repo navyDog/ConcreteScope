@@ -169,6 +169,16 @@ db.serialize(() => {
     )
   `);
 
+  // --- Création des index ---
+  db.run('CREATE INDEX IF NOT EXISTS idx_users_username ON usersCS(username)');
+
+  db.run('CREATE INDEX IF NOT EXISTS idx_chantiers_affaire ON chantiers(affaire_id)');
+  db.run('CREATE INDEX IF NOT EXISTS idx_chantiers_entreprise ON chantiers(entreprise_id)');
+
+  db.run('CREATE INDEX IF NOT EXISTS idx_eprouvettes_chantier ON eprouvettes(chantier_id)');
+
+  db.run('CREATE INDEX IF NOT EXISTS idx_revoked_tokens_token ON revoked_tokens(token)');
+
 
 });
 
