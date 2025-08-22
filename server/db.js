@@ -20,6 +20,15 @@ db.serialize(() => {
 
     db.run('PRAGMA foreign_keys = ON');
 
+    //table des tokens révoqués 
+    db.run(`
+    CREATE TABLE IF NOT EXISTS revoked_tokens (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      token TEXT NOT NULL UNIQUE,
+      revoked_at TEXT NOT NULL
+    )
+  `);
+
 //TABLE "users"
 // "id" c'est lidentifiant unique crée par SQLite
 // "username" nom de l'utilisateur
