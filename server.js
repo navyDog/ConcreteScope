@@ -173,11 +173,24 @@ app.use(express.static('public'));
 // Il manque un token d'identification pour empecher les requetes par n'importe qui 
 // il faut un  middleware pour verifier tout ca. Je me renseigne. 
 
+
+// Middleware de gestion des erreurs pour alleger le code 
+function errorHandler(err, req, res, next) {
+  console.error(err.stack); // log dans la console
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Erreur interne du serveur",
+  });
+}
+
+//module.exports = errorHandler; //si dans un autre fichier 
+
+
 //Requetes GET pour avoir la liste des affaires
 
 app.get('/api/affaires', (req, res) => {
   db.all('SELECT * FROM affaires', (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+     if (err) return next(err);
     res.json(rows);
   });
 });
@@ -186,7 +199,7 @@ app.get('/api/affaires', (req, res) => {
 
 app.get('/api/entreprises', (req, res) => {
   db.all('SELECT * FROM entreprises', (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return next(err);
     res.json(rows);
   });
 });
@@ -206,7 +219,7 @@ app.get('/api/chantiers', (req, res) => {
   `;
   db.all(sql, [], (err, rows) => {
     if (err) {
-      return res.status(500).json({ error: 'Erreur lecture chantiers' });
+      return next(err);
     }
     res.json(rows);
   });
@@ -219,8 +232,9 @@ app.get('/api/eprouvettes', (req, res) => {
   const sql = `SELECT * FROM eprouvettes WHERE chantier_id = ?`;
   db.all(sql, [chantierId], (err, rows) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Erreur DB' });
+      
+      return next(err);
+      
     }
     res.json(rows);
   });
@@ -238,7 +252,7 @@ app.post('/api/affaires', (req, res) => {
 
   //insertion dans la table affaires 
   db.run('INSERT INTO affaires (nom) VALUES (?)', [nom], function (err) {
-    if (err) return res.status(500).json({ error: err.message });
+     if (err) return next(err);
    // this.lastID = ID auto-incrémenté de la nouvelle affaire
     res.json({ id: this.lastID, nom });
   });
@@ -256,7 +270,7 @@ app.post('/api/entreprises', (req, res) => {
 
   //insertion dans la table entreprises
   db.run('INSERT INTO entreprises (nom) VALUES (?)', [nom], function (err) {
-    if (err) return res.status(500).json({ error: err.message });
+     if (err) return next(err);
 
    // this.lastID = ID auto-incrémenté de la nouvelle entreprise
     res.json({ id: this.lastID, nom });
@@ -277,8 +291,7 @@ app.post('/api/chantiers', (req, res) => {
 
   // Numérotation automatique par année
   db.get('SELECT COUNT(*) AS count FROM chantiers WHERE numero LIKE ?', [`${prefix}%`], (err, row) => {
-    if (err) return res.status(500).json({ error: err.message });
-
+    if (err) return next(err);
     const numero = `${prefix}${row.count + 1}`; // ex: "2025-B-1"
     console.log(numero, nomOuvrage, affaire_id, entreprise_id, date_reception, date_prelevement, slump );
 
@@ -291,7 +304,7 @@ app.post('/api/chantiers', (req, res) => {
     db.run(sql, params, function (err) {
       if (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Erreur création chantier' });
+         if (err) return next(err);
       }
       res.json({ id: this.lastID, numero: numero });
     });
@@ -306,7 +319,7 @@ app.post('/api/eprouvettes', (req, res) => {
 
   // Récupérer la date de réception du chantier
   db.get('SELECT date_reception FROM chantiers WHERE id = ?', [chantier_id], (err, chantier) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return next(err);
     if (!chantier || !chantier.date_reception) return res.status(400).json({ error: 'Date de réception non définie pour ce chantier' });
 
     const date_creation = new Date(chantier.date_reception);
@@ -332,7 +345,7 @@ app.post('/api/eprouvettes', (req, res) => {
     }
 
     stmt.finalize(err => {
-      if (err) return res.status(500).json({ error: err.message });
+      if (err) return next(err);
       res.json({ success: true });
     });
   });
@@ -343,11 +356,15 @@ app.get('/api/alleprouvettes', (req, res) => {
   db.all(`
     SELECT * FROM eprouvettes 
   `, [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+     if (err) return next(err);
     res.json(rows);
   });
 });
 
+
+
+//const errorHandler = require('./middlewares/errorHandler'); //si dans unautre fichier
+app.use(errorHandler);
 
 
 app.listen(3000, () => {
