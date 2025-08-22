@@ -4,6 +4,13 @@
 
 //SERVER EXPRESS
 
+/* const https = require('https');
+const fs = require('fs');
+
+const options = {
+  key: fs.readFileSync('key.pem'),   // clé privée
+  cert: fs.readFileSync('cert.pem')  // certificat auto-signé
+}; */
 
 //charge le module express qui permet de créer un serveur WEB en node.js
 const express = require('express');
@@ -21,16 +28,13 @@ app.use(express.json());
 // lit automatiquement les fichier statiques dans le dossier public
 app.use(express.static(path.resolve(__dirname, '../public')));
 
+//const authMiddleware = require('./middleware/auth');
+
+// Routes publiques
+//app.use('/auth', require('./routes/auth')); // login/register accessibles sans token
 
 
-
-
-
-
- 
-
-
-// Routes à utiliser
+// Routes à utiliser avec authentification
 app.use('/api/affaires', require('./routes/affairesRoutes'));
 app.use('/api/entreprises', require('./routes/entreprisesRoutes'));
 app.use('/api/chantiers', require('./routes/chantiersRoutes'));
@@ -42,11 +46,19 @@ app.use(require('./utils/errorHandler'));
 // initialise la DB + crée les tables
 require('./db');           
 //active CORS, autorise les requetes cross-origin
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', //  front vanilla
+  methods: ['GET','POST','PUT','DELETE'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
 
 // Il manque un token d'identification pour empecher les requetes par n'importe qui 
 // il faut un  middleware pour verifier tout ca. Je me renseigne. 
 
-app.listen(PORT, () => {
+ app.listen(PORT, () => {
   console.log(`✅ Serveur lancé sur http://localhost:${PORT}`);
-});
+}); 
+
+/* https.createServer(options, app).listen(PORT, () => {
+  console.log(`✅ Serveur lancé sur http://localhost:${PORT}`);
+}); */
