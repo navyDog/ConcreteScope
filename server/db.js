@@ -4,6 +4,13 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require("path");
 
 const db_name = path.join(__dirname, "data", "data.db");
+
+const fs = require("fs");
+const dataDir = path.join(__dirname, "data");
+
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir);
+}
 //Ouvre (ou crée si elle n'existe pas) un fichier SQLite qui va contenir la database.
 const db = new sqlite3.Database(db_name, (err) => {
   if (err) {
